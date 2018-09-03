@@ -5,6 +5,7 @@ public class QuickUnionUF
 {
 	private int[] id;
 	private int count;
+	private int touch;
 	
 	public QuickUnionUF(int N)
 	{
@@ -12,14 +13,21 @@ public class QuickUnionUF
 		id = new int[N];
 		for (int i = 0; i < N; i++)
 			id[i] = i;
+		touch = N;
 	}
 	
 	public int count()
-	{ return count; }
+	{
+		return count;
+	}
 	
 	public int find(int p)
 	{
-		while (p != id[p]) p = id[p];
+		while (p != id[p]) {
+			p = id[p];	
+			touch += 2;
+		}
+		touch++;
 		return p;
 	}
 	
@@ -28,27 +36,40 @@ public class QuickUnionUF
 	
 	public void union(int p, int q)
 	{
-		int pId = find(p);
-		int qId = find(q);
+		int pRoot = find(p);
+		int qRoot = find(q);
 		
-		if (pId == qId) return;
+		if (pRoot == qRoot) return;
 		
-		id[pId] = qId; 
+		id[pRoot] = qRoot;
+		touch++;
 		count--;		
 	}
 		
+	public void resetTouch()
+	{
+		touch = 0;
+	}
+	
+	public int getTouch()
+	{
+		return touch;
+	}
+	
 	public static void main(String[] args)
 	{
 		In in = new In(args[0]);
 		int N = in.readInt();
-		QuickFindUF uf = new QuickFindUF(N);
+		QuickUnionUF uf = new QuickUnionUF(N);
 		while (!in.isEmpty())
 		{
 			int p = in.readInt();
 			int q = in.readInt();
+			uf.resetTouch();
 			if (uf.connected(p, q)) continue;
 			uf.union(p, q);
 			StdOut.println(p + " " + q);
+			StdOut.println("Touch = " + uf.getTouch());
 		}
 		StdOut.println(uf.count() + " components");
 	}

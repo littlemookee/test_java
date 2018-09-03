@@ -1,55 +1,55 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
-public class QuickFindUF
+public class WeightedQuickUnionUF
 {
 	private int[] id;
+	private int[] sz;
 	private int count;
 	private int touch;
 	
-	public QuickFindUF(int N)
-	{		
+	public WeightedQuickUnionUF(int N)
+	{
 		count = N;
 		id = new int[N];
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < N; i++) {
 			id[i] = i;
+			sz[i] = 1;
+		}
 		touch = N;
 	}
 	
 	public int count()
-	{ 
+	{
 		return count;
 	}
 	
 	public int find(int p)
 	{
+		while (p != id[p]) {
+			p = id[p];	
+			touch += 2;
+		}
 		touch++;
-		return id[p];
+		return p;
 	}
 	
 	public boolean connected(int p, int q)
-	{
-		return find(p) == find(q);
-	}
+	{ return find(p) == find(q);}
 	
 	public void union(int p, int q)
 	{
-		int pId = id[p];
-		int qId = id[q];
-		touch += 2;
+		int pRoot = find(p);
+		int qRoot = find(q);
 		
-		if (pId == qId) return;
+		if (pRoot == qRoot) return;
 		
-		for (int i = 0; i < id.length; i++) {
-			touch++;
-			if (id[i] == pId) {
-				id[i] = qId;
-				 touch++;				
-			}			
-		}
+		if (sz[pRoot] < sz[qRoot]) { id[pRoot] = qRoot; sz[qRoot] += sz[pRoot]; }		
+		else 					   { id[qRoot] = pRoot; sz[pRoot] += sz[qRoot]; }		
+		touch++;
 		count--;		
 	}
-	
+		
 	public void resetTouch()
 	{
 		touch = 0;
@@ -59,12 +59,12 @@ public class QuickFindUF
 	{
 		return touch;
 	}
-		
+	
 	public static void main(String[] args)
 	{
 		In in = new In(args[0]);
 		int N = in.readInt();
-		QuickFindUF uf = new QuickFindUF(N);
+		WeightedQuickUnionUF uf = new WeightedQuickUnionUF(N);
 		while (!in.isEmpty())
 		{
 			int p = in.readInt();
