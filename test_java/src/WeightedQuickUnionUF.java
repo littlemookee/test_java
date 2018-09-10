@@ -28,7 +28,7 @@ public class WeightedQuickUnionUF
 	public int find(int p)
 	{
 		while (p != id[p]) {
-			p = id[p];	
+			p = id[p];
 			touch += 2;
 		}
 		touch++;
@@ -45,8 +45,8 @@ public class WeightedQuickUnionUF
 		
 		if (pRoot == qRoot) return;
 		
-		if (sz[pRoot] < sz[qRoot]) { id[pRoot] = qRoot; sz[qRoot] += sz[pRoot]; }		
-		else 					   { id[qRoot] = pRoot; sz[pRoot] += sz[qRoot]; }		
+		if (sz[pRoot] <= sz[qRoot]) { id[pRoot] = qRoot; sz[qRoot] += sz[pRoot]; }		
+		else 					    { id[qRoot] = pRoot; sz[pRoot] += sz[qRoot]; }		
 		touch++;
 		count--;		
 	}
