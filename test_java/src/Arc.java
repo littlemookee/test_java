@@ -2,17 +2,17 @@ public class Arc
 {
 	private static final String NEWLINE = System.getProperty("line.separator");
 	
-	final int isymbol;
-	final int osymbol;
+	final int iSymbol;
+	final int oSymbol;
 	final double weight;
-	final int nextnode;
+	final int nextNode;
 	
-	public Arc(int isymbol, int osymbol, double weight, int nextnode)
+	public Arc(int iSymbol, int oSymbol, double weight, int nextNode)
 	{
-		this.isymbol = isymbol;
-		this.osymbol = osymbol;
+		this.iSymbol = iSymbol;
+		this.oSymbol = oSymbol;
 		this.weight = weight;
-		this.nextnode = nextnode;				
+		this.nextNode = nextNode;				
 	}
 	
     /**

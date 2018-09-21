@@ -1,61 +1,104 @@
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Bag;
+import edu.princeton.cs.algs4.*;
 import java.util.NoSuchElementException;
 
 public class WFST
 {
-	private final int numnodes;
-	private final int numarcs;
+	private Integer numNodes;
+	private Integer numArcs;
+	private Integer numFinals;
 	private Bag<Arc>[] arcs;
-	private final int finalnode;
-	private final double finalweight;
+	private Integer[] finalNodes;
+	private Double[] finalWeights;
 	
-	public WFST(In in)
+	private <T> void resize(T[] a, int newSize)
 	{
-		try {
-			
-			while (!in.isEmpty()) {
-				String[] splited = in.readLine().split("\\s+");
-				switch (splited.length) {
-				case 1: {
-					finalnode = Integer.parseInt(splited[0]);
-					finalweight = 0.0;
-				}
-					break;
-				case 2:
-					break;
-				case 4:
-					break;
-				case 5:
-					break;
-				default:
-					break;
-				}
-				
-				
-			}
-			
-			
-			
-            numnodes = in.readInt();
-            if (numnodes < 0) throw new IllegalArgumentException("number of nodes in a WFST must be nonnegative");
-            /*indegree = new int[V];
-            adj = (Bag<Integer>[]) new Bag[V];
-            for (int v = 0; v < V; v++) {
-                adj[v] = new Bag<Integer>();
-            }*/
-            numarcs = in.readInt();
-            if (numarcs < 0) throw new IllegalArgumentException("number of arcs in a WFST must be nonnegative");
-            /*for (int i = 0; i < E; i++) {
-                int v = in.readInt();
-                int w = in.readInt();
-                addEdge(v, w); 
-            }*/
-        }
-        catch (NoSuchElementException e) {
-            throw new IllegalArgumentException("invalid input format in Digraph constructor", e);
-        }		
+		if (newSize == 0) newSize = 1;
+		T[] newA = (T[]) new Object[newSize];
+		for (int i=0; i<a.length; i++) newA[i] = a[i];
+		a = newA;
+	}
+	
+	private void addFinalNode(int node, double weight)
+	{
+		if (finalNodes.length <= numFinals) {
+			resize(finalNodes, 2*numFinals);
+			resize(finalWeights, 2*numFinals);
+		}
+		finalNodes[numFinals] = node;
+		finalWeights[numFinals++] = weight;
+	}
+	
+	private void addArc(int startNode, Arc arc)
+	{
+		if (arcs.length <= numNodes) {
+			resize(arcs, 2*numNodes);
+			arcs[numNodes] = new Bag<Arc>();
+		}
+		arcs[startNode].add(arc);
+		numArcs++;
+	}
+	
+	public WFST(String fileName)
+	{
+		In in = new In(fileName);
+		ST<Integer,Integer> st = new ST<Integer,Integer>();
 		
+		numNodes = 0;
+		numArcs = 0;
+		numFinals = 0;
+		
+		while (!in.isEmpty()) {
+			String line = in.readLine();
+			String[] splited = line.split("\\s+");
+			switch (splited.length) {
+				case 1: {
+					int node = Integer.parseInt(splited[0]);
+					double weight = 0.0;
+					if (!st.contains(node)) st.put(node, numNodes++);
+					addFinalNode(st.get(node), weight);
+				}
+				break;
+				case 2: {
+					int node = Integer.parseInt(splited[0]);
+					double weight = Double.parseDouble(splited[1]);
+					if (!st.contains(node)) st.put(node, numNodes++);
+					addFinalNode(st.get(node), weight);
+				}
+				break;
+				case 4: {
+					int startNode = Integer.parseInt(splited[0]);
+					int endNode = Integer.parseInt(splited[1]);
+					int iSymbol = Integer.parseInt(splited[2]);
+					int oSymbol = Integer.parseInt(splited[3]);
+					double weight = 0.0;
+					
+					if (!st.contains(startNode))
+						st.put(startNode, numNodes++);
+					if (!st.contains(endNode))
+						st.put(endNode, numNodes++);
+					
+					addArc(st.get(startNode), new Arc(iSymbol, oSymbol, weight, st.get(endNode)));					
+				}
+				break;
+				case 5: {
+					int startNode = Integer.parseInt(splited[0]);
+					int endNode = Integer.parseInt(splited[1]);
+					int iSymbol = Integer.parseInt(splited[2]);
+					int oSymbol = Integer.parseInt(splited[3]);
+					double weight = Integer.parseInt(splited[4]);
+					
+					if (!st.contains(startNode))
+						st.put(startNode, numNodes++);
+					if (!st.contains(endNode))
+						st.put(endNode, numNodes++);
+					
+					addArc(st.get(startNode), new Arc(iSymbol, oSymbol, weight, st.get(endNode)));					
+				}
+				break;
+				default:
+					throw new IllegalArgumentException("Wrong format of WFST line: " + line);
+			}
+        }
 	}	
 	
 	public static void main(String[] args)
