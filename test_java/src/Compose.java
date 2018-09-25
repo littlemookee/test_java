@@ -4,7 +4,7 @@ import edu.princeton.cs.algs4.*;
 public class Compose {
 	ST<Integer,ComposeState> Q;
 	SET<ComposeState> I;
-	Queue<Integer> S;
+	Queue<Integer> queue;
 	Bag<FinalState> F;
 	
 	public Compose(WFST wfst1, WFST wfst2, Filter filter) {
@@ -16,11 +16,11 @@ public class Compose {
 					Integer state = Q.size();
 					Q.put(state, composeState);
 					I.add(composeState);
-					S.enqueue(state);
+					queue.enqueue(state);
 				}
 		
-		while (!S.isEmpty()) {
-			Integer state = S.dequeue();
+		while (!queue.isEmpty()) {
+			Integer state = queue.dequeue();
 			ComposeState composeState = Q.get(state);
 			if (wfst1.getFinalStates().contains(new FinalState(composeState.state1,0.0)) &&
 				wfst2.getFinalStates().contains(new FinalState(composeState.state2,0.0)) &&
