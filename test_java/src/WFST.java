@@ -6,12 +6,14 @@ public class WFST
 	private static final String NEWLINE = System.getProperty("line.separator");
 	
 	private final ST<Integer,Bag<Arc>> arcs;
-	private final Bag<FinalNode> finalNodes;
+	private final SET<FinalState> finalStates;
+	private final SET<Integer> initialStates;
 		
 	public WFST(String fileName)
 	{
 		arcs = new ST<Integer,Bag<Arc>>();
-		finalNodes = new Bag<FinalNode>();
+		finalStates = new SET<FinalState>();
+		initialStates = new SET<Integer>();
 		In in = new In(fileName);
 		while (!in.isEmpty()) {
 			String line = in.readLine();
@@ -19,46 +21,54 @@ public class WFST
 			switch (splited.length) {
 				case 1: {
 					Integer node = Integer.parseInt(splited[0]);					
-					finalNodes.add(new FinalNode(node, 0.0));
+					finalStates.add(new FinalState(node, 0.0));
+					if (!initialStates.contains(node)) initialStates.add(node);
 				}
 				break;
 				case 2: {
 					Integer node = Integer.parseInt(splited[0]);
 					Double weight = Double.parseDouble(splited[1]);
-					finalNodes.add(new FinalNode(node, weight));					
+					finalStates.add(new FinalState(node, weight));
+					if (!initialStates.contains(node)) initialStates.add(node);
 				}
 				break;
 				case 4: {
-					int startNode = Integer.parseInt(splited[0]);
-					int endNode = Integer.parseInt(splited[1]);
+					int prevState = Integer.parseInt(splited[0]);
+					int nextState = Integer.parseInt(splited[1]);
 					int iSymbol = Integer.parseInt(splited[2]);
 					int oSymbol = Integer.parseInt(splited[3]);
 					
 					Bag<Arc> outArcs;
-					if (arcs.contains(startNode)) outArcs = arcs.get(startNode);
+					if (arcs.contains(prevState)) outArcs = arcs.get(prevState);
 					else 						  outArcs = new Bag<Arc>();
-					outArcs.add(new Arc(iSymbol,oSymbol,0.0,endNode));
-					arcs.put(startNode, outArcs);
+					outArcs.add(new Arc(iSymbol,oSymbol,0.0,nextState));
+					arcs.put(prevState, outArcs);
+					if (!initialStates.contains(prevState)) initialStates.add(prevState);
 				}
 				break;
 				case 5: {
-					int startNode = Integer.parseInt(splited[0]);
-					int endNode = Integer.parseInt(splited[1]);
+					int prevState = Integer.parseInt(splited[0]);
+					int nextState = Integer.parseInt(splited[1]);
 					int iSymbol = Integer.parseInt(splited[2]);
 					int oSymbol = Integer.parseInt(splited[3]);					
 					double weight = Double.parseDouble(splited[4]);
 					
 					Bag<Arc> outArcs;
-					if (arcs.contains(startNode)) outArcs = arcs.get(startNode);
+					if (arcs.contains(prevState)) outArcs = arcs.get(prevState);
 					else 						  outArcs = new Bag<Arc>();
-					outArcs.add(new Arc(iSymbol,oSymbol,weight,endNode));
-					arcs.put(startNode, outArcs);
+					outArcs.add(new Arc(iSymbol,oSymbol,weight,nextState));
+					arcs.put(prevState, outArcs);
+					if (!initialStates.contains(prevState)) initialStates.add(prevState);
 				}
 				break;
 				default:
 					throw new IllegalArgumentException("Wrong format of WFST line: " + line);
 			}
         }
+		for (Integer node : arcs.keys())
+			for (Arc arc : arcs.get(node))
+				if (initialStates.contains(arc.getNextNode()))
+					initialStates.delete(arc.getNextNode());
 	}
 	
     /**
@@ -69,13 +79,22 @@ public class WFST
         for (Integer key : arcs.keys())
         	for (Arc arc : arcs.get(key))
         		s.append(key + " " + arc + NEWLINE);        
-        for (FinalNode node : finalNodes)
+        for (FinalState node : finalStates)
         	s.append(node + NEWLINE);
         return s.toString();
-    }	
+    }
+    
+    public SET<Integer> getInitialStates() {
+    	return initialStates;
+    }
+    
+    public SET<FinalState> getFinalStates() {
+    	return finalStates;    	
+    }
 	
     public static void main(String[] args) {    	
         WFST wfst = new WFST(args[0]);
         StdOut.println(wfst);
+        StdOut.println("Initial states: " + wfst.getInitialStates());
     }
 }

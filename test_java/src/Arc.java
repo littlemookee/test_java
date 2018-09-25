@@ -13,6 +13,11 @@ public class Arc
 		this.nextNode = nextNode;				
 	}
 	
+	public Integer getNextNode() {
+		return nextNode;		
+	}
+	
+	
     /**
      * Returns a string representation of the Arc.
      */
