@@ -1,31 +1,30 @@
 public class Arc
 {	
-	final Integer iSymbol;
-	final Integer oSymbol;
-	final Double weight;
-	final Integer nextNode;
+	final Integer i;
+	final Integer o;
+	final Integer n;
+	final Double w;	
 	
-	public Arc(Integer iSymbol, Integer oSymbol, Double weight, Integer nextNode)
+	public Arc(Integer i, Integer o, Double w, Integer n)
 	{
-		this.iSymbol = iSymbol;
-		this.oSymbol = oSymbol;
-		this.weight = weight;
-		this.nextNode = nextNode;				
-	}
+		this.i = i;
+		this.o = o;
+		this.w = w;
+		this.n = n;				
+	}	
 	
-	public Integer getNextNode() {
-		return nextNode;		
-	}
-	
+	public Integer i() { return i; }
+	public Integer o() { return o; }
+	public Integer n() { return n; }
+	public Double w() { return w; }	
 	
     /**
      * Returns a string representation of the Arc.
      */
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(nextNode + " " + iSymbol + " " + oSymbol);
-        if (weight != 0.0) 
-            s.append(" " + weight);
+        s.append(n + " " + i + " " + o);
+        if (w != 0.0) s.append(" " + w);
         return s.toString();
     }	
 }

@@ -6,69 +6,68 @@ public class WFST
 	private static final String NEWLINE = System.getProperty("line.separator");
 	
 	private final ST<Integer,Bag<Arc>> arcs;
-	private final SET<FinalState> finalStates;
-	private final SET<Integer> initialStates;
+	private final SET<Integer> I;
+	private final ST<Integer,Double> F;
 		
 	public WFST(String fileName)
 	{
 		arcs = new ST<Integer,Bag<Arc>>();
-		finalStates = new SET<FinalState>();
-		initialStates = new SET<Integer>();
+		I = new SET<Integer>();
+		F = new ST<Integer,Double>();		
 		In in = new In(fileName);
 		while (!in.isEmpty()) {
 			String line = in.readLine();
 			String[] splited = line.split("\\s+");
 			switch (splited.length) {
 				case 1: {
-					Integer node = Integer.parseInt(splited[0]);					
-					finalStates.add(new FinalState(node, 0.0));
-					if (!initialStates.contains(node)) initialStates.add(node);
+					Integer q = Integer.parseInt(splited[0]);
+					if (!I.contains(q)) I.add(q);
+					F.put(q, 0.0);
 				}
 				break;
 				case 2: {
-					Integer node = Integer.parseInt(splited[0]);
-					Double weight = Double.parseDouble(splited[1]);
-					finalStates.add(new FinalState(node, weight));
-					if (!initialStates.contains(node)) initialStates.add(node);
+					Integer q = Integer.parseInt(splited[0]);
+					Double w = Double.parseDouble(splited[1]);
+					if (!I.contains(q)) I.add(q);
+					F.put(q, w);
 				}
 				break;
 				case 4: {
-					int prevState = Integer.parseInt(splited[0]);
-					int nextState = Integer.parseInt(splited[1]);
-					int iSymbol = Integer.parseInt(splited[2]);
-					int oSymbol = Integer.parseInt(splited[3]);
+					int p = Integer.parseInt(splited[0]);
+					int n = Integer.parseInt(splited[1]);
+					int i = Integer.parseInt(splited[2]);
+					int o = Integer.parseInt(splited[3]);
 					
-					Bag<Arc> outArcs;
-					if (arcs.contains(prevState)) outArcs = arcs.get(prevState);
-					else 						  outArcs = new Bag<Arc>();
-					outArcs.add(new Arc(iSymbol,oSymbol,0.0,nextState));
-					arcs.put(prevState, outArcs);
-					if (!initialStates.contains(prevState)) initialStates.add(prevState);
+					Bag<Arc> E;
+					if (arcs.contains(p)) E = arcs.get(p);
+					else				  E = new Bag<Arc>();
+					E.add(new Arc(i, o, 0.0, n));
+					arcs.put(p, E);
+					if (!I.contains(p)) I.add(p);
 				}
 				break;
 				case 5: {
-					int prevState = Integer.parseInt(splited[0]);
-					int nextState = Integer.parseInt(splited[1]);
-					int iSymbol = Integer.parseInt(splited[2]);
-					int oSymbol = Integer.parseInt(splited[3]);					
-					double weight = Double.parseDouble(splited[4]);
+					int p = Integer.parseInt(splited[0]);
+					int n = Integer.parseInt(splited[1]);
+					int i = Integer.parseInt(splited[2]);
+					int o = Integer.parseInt(splited[3]);					
+					double w = Double.parseDouble(splited[4]);
 					
-					Bag<Arc> outArcs;
-					if (arcs.contains(prevState)) outArcs = arcs.get(prevState);
-					else 						  outArcs = new Bag<Arc>();
-					outArcs.add(new Arc(iSymbol,oSymbol,weight,nextState));
-					arcs.put(prevState, outArcs);
-					if (!initialStates.contains(prevState)) initialStates.add(prevState);
+					Bag<Arc> E;
+					if (arcs.contains(p)) E = arcs.get(p);
+					else				  E = new Bag<Arc>();
+					E.add(new Arc(i, o, w, n));
+					arcs.put(p, E);
+					if (!I.contains(p)) I.add(p);
 				}
 				break;
 				default:
 					throw new IllegalArgumentException("Wrong format of WFST line: " + line);
 			}
         }
-		for (Integer node : arcs.keys())
-			for (Arc arc : arcs.get(node))
-				if (initialStates.contains(arc.getNextNode()))
-					initialStates.delete(arc.getNextNode());
+		for (Integer q : arcs.keys())
+			for (Arc e : arcs.get(q))
+				if (I.contains(e.n())) I.delete(e.n());
 	}
 	
     /**
@@ -76,21 +75,29 @@ public class WFST
      */
     public String toString() {
         StringBuilder s = new StringBuilder();
-        for (Integer key : arcs.keys())
-        	for (Arc arc : arcs.get(key))
-        		s.append(key + " " + arc + NEWLINE);        
-        for (FinalState node : finalStates)
-        	s.append(node + NEWLINE);
+        for (Integer q : arcs.keys())
+        	for (Arc e : arcs.get(q))
+        		s.append(q + " " + e + NEWLINE);        
+        for (Integer q : F.keys())
+        	s.append(q + " " + F.get(q) + NEWLINE);
         return s.toString();
     }
     
     public SET<Integer> getInitialStates() {
-    	return initialStates;
+    	return I;
     }
     
-    public SET<FinalState> getFinalStates() {
-    	return finalStates;    	
+    public ST<Integer,Double> getFinalStates() {
+    	return F;
     }
+    
+    public boolean isFinal(Integer q) {
+    	return F.contains(q);    	
+    }
+    
+    public Bag<Arc> getArcs(Integer q) {
+    	return arcs.get(q);
+    }    
 	
     public static void main(String[] args) {    	
         WFST wfst = new WFST(args[0]);
