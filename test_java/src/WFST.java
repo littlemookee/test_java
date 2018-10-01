@@ -83,21 +83,13 @@ public class WFST
         return s.toString();
     }
     
-    public SET<Integer> getInitialStates() {
-    	return I;
-    }
+    public SET<Integer> getInitialStates() { return I; }
     
-    public ST<Integer,Double> getFinalStates() {
-    	return F;
-    }
+    public ST<Integer,Double> getFinalStates() { return F; }
     
-    public boolean isFinal(Integer q) {
-    	return F.contains(q);    	
-    }
+    public boolean isFinal(Integer q) { return F.contains(q); }
     
-    public Bag<Arc> getArcs(Integer q) {
-    	return arcs.get(q);
-    }    
+    public Bag<Arc> getArcs(Integer q) { return arcs.get(q); }    
 	
     public static void main(String[] args) {    	
         WFST wfst = new WFST(args[0]);

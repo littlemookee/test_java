@@ -22,20 +22,24 @@ public class Filter
 	WFST wfst1;
 	WFST wfst2;
 	private final Bag<Integer> I;
-	private final SET<Integer> Q;
+	private final ST<Integer,Double> Q;
 	
 	public Filter(WFST wfst1, WFST wfst2) {
 		this.wfst1 = wfst1;
 		this.wfst2 = wfst2;
 		I = new Bag<Integer>();
 		I.add(0);
-		Q = new SET<Integer>();
-		Q.add(0);
+		Q = new ST<Integer,Double>();
+		Q.put(0,0.0);
 	}
 	
 	public Bag<Integer> getInitialStates() { return I; }
 	
-	public SET<Integer> getStates() { return Q; }
+	public Iterable<Integer> getStates() { return Q.keys(); }
+	
+	public boolean containState(Integer q) { return Q.contains(q);  }
+	
+	public Double finalWeight(Integer q ) { return Q.get(q); }
 	
 	public FilterResult filter(Arc e1, Arc e2, Integer q3) {
 		int q = 0;

@@ -4,15 +4,16 @@ import edu.princeton.cs.algs4.*;
 public class Compose {
 	SET<Integer> I;
 	ST<Integer,Double> F;
-	ST<Integer,ComposeState> Q;
-	Queue<Integer> queue;
-	
+	ST<ComposeState,Integer> Q;
+	Queue<ComposeState> queue;
+	private final ST<Integer,Bag<Arc>> arcs;
 	
 	public Compose(WFST wfst1, WFST wfst2, Filter filter) {
 		I = new SET<Integer>();
 		F = new ST<Integer,Double>();
-		Q = new ST<Integer,ComposeState>();
-		queue = new Queue<Integer>();
+		Q = new ST<ComposeState,Integer>();
+		queue = new Queue<ComposeState>();
+		arcs = new ST<Integer,Bag<Arc>>();		
 		
 		// initialize containers for compose wfst and queue
 		for (Integer i1 : wfst1.getInitialStates())
@@ -20,46 +21,56 @@ public class Compose {
 				for (Integer i3 : filter.getInitialStates()) {
 					ComposeState composeState = new ComposeState(i1, i2, i3);
 					Integer i = Q.size();
-					Q.put(i, composeState);
+					Q.put(composeState, i);
 					I.add(i);
-					queue.enqueue(i);
+					queue.enqueue(composeState);
 				}
 		
 		// make DFS to compose two wfsts
 		while (!queue.isEmpty()) {
-			Integer q = queue.dequeue();			
+			ComposeState composeState = queue.dequeue();
 			
-			ComposeState composeState = Q.get(q);
-			
-			// q is final state
+			// is final state
 			if (wfst1.isFinal(composeState.q1()) &&
 				wfst2.isFinal(composeState.q2()) &&
-				filter.getStates().contains(composeState.q3())) {
+				filter.containState(composeState.q3())) {
 					Double weight = wfst1.getFinalStates().get(composeState.q1()) +
 									wfst2.getFinalStates().get(composeState.q2()) +
-									F.get(composeState.q3());
-					F.put(q, weight);
+									filter.finalWeight(composeState.q3());
+					F.put(Q.get(composeState), weight);
 			}
 			
 			// iterate over all arcs from q1 and q2 and make composition if filter allows
 			for (Arc e1 : wfst1.getArcs(composeState.q1())) {
 				for (Arc e2 : wfst2.getArcs(composeState.q2())) {
 					Filter.FilterResult f = filter.filter(e1, e2, composeState.q3());
+					
 					if (filter.isBlockingState(f.q3())) continue;
 					
+					// add state
+					ComposeState newComposeState = new ComposeState(f.e1().n(), f.e2().n(),f.q3());
+					if (!Q.contains(newComposeState)) {
+						Q.put(newComposeState, Q.size());
+						queue.enqueue(newComposeState);
+					}
 					
-					
+					// add arc
+					Bag<Arc> E;
+					Integer p = Q.get(composeState);
+					Integer n = Q.get(newComposeState);
+					if (arcs.contains(p)) E = arcs.get(p);
+					else				  E = new Bag<Arc>();
+					E.add(new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), n));
+					arcs.put(p, E);
 				}
 			}
-			
-			
 		}
 	}
 	
     public static void main(String[] args) {    	
         WFST wfst1 = new WFST(args[0]);
         WFST wfst2 = new WFST(args[1]);        
-        Compose compose = new Compose(wfst1, wfst2, new Filter(wfst1,wfst2));
-        //StdOut.println("Start nodes: " + wfst.getStartNodes());
+        Compose composeWFST = new Compose(wfst1, wfst2, new Filter(wfst1, wfst2));
+        StdOut.println(composeWFST);
     }
 }
