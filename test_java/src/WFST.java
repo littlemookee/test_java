@@ -89,7 +89,10 @@ public class WFST
     
     public boolean isFinal(Integer q) { return F.contains(q); }
     
-    public Bag<Arc> getArcs(Integer q) { return arcs.get(q); }    
+    public Bag<Arc> getArcs(Integer q) {
+    	if (arcs.contains(q)) return arcs.get(q);
+    	else 				  return new Bag<Arc>();
+    }    
 	
     public static void main(String[] args) {    	
         WFST wfst = new WFST(args[0]);

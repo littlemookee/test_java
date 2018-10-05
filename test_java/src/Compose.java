@@ -2,10 +2,12 @@
 import edu.princeton.cs.algs4.*;
 
 public class Compose {
-	SET<Integer> I;
-	ST<Integer,Double> F;
-	ST<ComposeState,Integer> Q;
-	Queue<ComposeState> queue;
+	private static final String NEWLINE = System.getProperty("line.separator");
+	
+	private final SET<Integer> I;
+	private final ST<Integer,Double> F;
+	private final ST<ComposeState,Integer> Q;
+	private final Queue<ComposeState> queue;
 	private final ST<Integer,Bag<Arc>> arcs;
 	
 	public Compose(WFST wfst1, WFST wfst2, Filter filter) {
@@ -16,13 +18,13 @@ public class Compose {
 		arcs = new ST<Integer,Bag<Arc>>();		
 		
 		// initialize containers for compose wfst and queue
-		for (Integer i1 : wfst1.getInitialStates())
-			for (Integer i2 : wfst2.getInitialStates())
-				for (Integer i3 : filter.getInitialStates()) {
-					ComposeState composeState = new ComposeState(i1, i2, i3);
-					Integer i = Q.size();
-					Q.put(composeState, i);
-					I.add(i);
+		for (Integer q1 : wfst1.getInitialStates())
+			for (Integer q2 : wfst2.getInitialStates())
+				for (Integer q3 : filter.getInitialStates()) {
+					ComposeState composeState = new ComposeState(q1, q2, q3);
+					Integer q = Q.size();
+					Q.put(composeState, q);
+					I.add(q);
 					queue.enqueue(composeState);
 				}
 		
@@ -67,9 +69,24 @@ public class Compose {
 		}
 	}
 	
+    /**
+     * Returns a string representation of the Arc.
+     */
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        for (Integer q : arcs.keys())
+        	for (Arc e : arcs.get(q))
+        		s.append(q + " " + e + NEWLINE);        
+        for (Integer q : F.keys())
+        	s.append(q + " " + F.get(q) + NEWLINE);
+        return s.toString();
+    }
+	
     public static void main(String[] args) {    	
         WFST wfst1 = new WFST(args[0]);
-        WFST wfst2 = new WFST(args[1]);        
+        StdOut.println(wfst1);        
+        WFST wfst2 = new WFST(args[1]);
+        StdOut.println(wfst2);
         Compose composeWFST = new Compose(wfst1, wfst2, new Filter(wfst1, wfst2));
         StdOut.println(composeWFST);
     }
