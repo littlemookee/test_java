@@ -62,15 +62,19 @@ public class Compose {
 					Integer n = Q.get(newComposeState);
 					if (arcs.contains(p)) E = arcs.get(p);
 					else				  E = new Bag<Arc>();
-					E.add(new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), n));
+					Arc arc = new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), n); 
+					E.add(arc);
 					arcs.put(p, E);
+					StdOut.println(p + " " + arc);
 				}
 			}
-		}
+		}		
+		if (F.isEmpty())
+			throw new IllegalArgumentException("Compose: Cannot compose these WFSTs with this filter");
 	}
 	
     /**
-     * Returns a string representation of the Arc.
+     * Returns a string representation of the Arc
      */
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -84,10 +88,10 @@ public class Compose {
 	
     public static void main(String[] args) {    	
         WFST wfst1 = new WFST(args[0]);
-        StdOut.println(wfst1);        
+        StdOut.println(wfst1);
         WFST wfst2 = new WFST(args[1]);
         StdOut.println(wfst2);
-        Compose composeWFST = new Compose(wfst1, wfst2, new Filter(wfst1, wfst2));
+        Compose composeWFST = new Compose(wfst1, wfst2, new EpsilonMatchingFilter(wfst1, wfst2));
         StdOut.println(composeWFST);
     }
 }

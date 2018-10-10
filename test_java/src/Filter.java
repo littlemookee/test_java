@@ -1,9 +1,8 @@
 
-import edu.princeton.cs.algs4.*;
-
-public class Filter
+public interface Filter
 {
-	public class FilterResult {
+	public class FilterResult
+	{
 		private final Arc e1;
 		private final Arc e2;
 		private final int q3;
@@ -17,35 +16,10 @@ public class Filter
 		public Arc e1() { return e1; }
 		public Arc e2() { return e2; }
 		public int q3() { return q3; }		
-	}
-	
-	WFST wfst1;
-	WFST wfst2;
-	private final Bag<Integer> I;
-	private final ST<Integer,Double> Q;
-	
-	public Filter(WFST wfst1, WFST wfst2) {
-		this.wfst1 = wfst1;
-		this.wfst2 = wfst2;
-		I = new Bag<Integer>();
-		I.add(0);
-		Q = new ST<Integer,Double>();
-		Q.put(0,0.0);
-	}
-	
-	public Bag<Integer> getInitialStates() { return I; }
-	
-	public Iterable<Integer> getStates() { return Q.keys(); }
-	
-	public boolean containState(Integer q) { return Q.contains(q);  }
-	
-	public Double finalWeight(Integer q ) { return Q.get(q); }
-	
-	public FilterResult filter(Arc e1, Arc e2, Integer q3) {
-		int q = 0;
-		if (e1.o() != e2.i()) q = 1;
-		return new FilterResult(e1, e2, q);
-	}
-	
-	public boolean isBlockingState(Integer q) { return q == Q.size(); }
+	}	
+	public Iterable<Integer> getInitialStates();
+	public boolean containState(Integer q);
+	public Double finalWeight(Integer q);
+	public FilterResult filter(Arc e1, Arc e2, Integer q3);
+	public boolean isBlockingState(Integer q);	
 }
