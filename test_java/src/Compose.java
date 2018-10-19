@@ -65,7 +65,7 @@ public class Compose {
 					Arc arc = new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), n); 
 					E.add(arc);
 					arcs.put(p, E);
-					StdOut.println(p + " " + arc);
+					//StdOut.println(p + " " + arc);
 				}
 			}
 		}		
@@ -80,7 +80,8 @@ public class Compose {
         StringBuilder s = new StringBuilder();
         for (Integer q : arcs.keys())
         	for (Arc e : arcs.get(q))
-        		s.append(q + " " + e + NEWLINE);        
+        		if (e.i() != -1 && e.o() != -1)
+        			s.append(q + " " + e + NEWLINE);        
         for (Integer q : F.keys())
         	s.append(q + " " + F.get(q) + NEWLINE);
         return s.toString();

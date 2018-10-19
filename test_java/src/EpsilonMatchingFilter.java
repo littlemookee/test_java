@@ -28,10 +28,10 @@ public class EpsilonMatchingFilter implements Filter
 	@Override
 	public FilterResult filter(Arc e1, Arc e2, Integer q3) {
 		int q = Q.size();
-		if (e1.o() != 0 && e2.o() != 0 && e1.o() == e2.i()) q = 0;
-		if (e1.o() == 0 && e2.o() == 0 && q3 == 0) q = 0;
-		if (e2.o() == 0 && q3 != 2) q = 1;
-		if (e1.o() == 0 && q3 != 1) q = 2;		
+		if (e1.o() >  0 && e2.i() >  0 && e1.o() == e2.i())                       q = 0;
+		if (e1.i() !=-1 && e1.o() == 0 && e2.i() == 0  && e2.o() !=-1 && q3 == 0) q = 0;
+		if (e1.o() ==-1 && e2.i() == 0 && e2.o() != -1 && q3 != 2)                q = 1;
+		if (e1.i() !=-1 && e1.o() == 0 && e2.i() == -1 && q3 != 1)                q = 2;		
 		return new FilterResult(e1, e2, q);
 	}
 

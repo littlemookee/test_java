@@ -65,9 +65,21 @@ public class WFST
 					throw new IllegalArgumentException("Wrong format of WFST line: " + line);
 			}
         }
-		for (Integer q : arcs.keys())
+		for (Integer q : arcs.keys())			
 			for (Arc e : arcs.get(q))
 				if (I.contains(e.n())) I.delete(e.n());
+		
+		for (Integer f : F.keys()) {
+			Bag<Arc> E;
+			if (arcs.contains(f)) E = arcs.get(f);
+			else {
+				E = new Bag<Arc>();
+				arcs.put(f, E);	
+			}
+			// Use -1 as <eps>_L, add for each state arc(-1,0) arc(0,-1)
+			E.add(new Arc(-1, 0, 0.0, f));
+			E.add(new Arc(0, -1, 0.0, f));
+		}
 	}
 	
     /**
@@ -77,7 +89,8 @@ public class WFST
         StringBuilder s = new StringBuilder();
         for (Integer q : arcs.keys())
         	for (Arc e : arcs.get(q))
-        		s.append(q + " " + e + NEWLINE);        
+        		if (e.i() != -1 && e.o() != -1)
+        			s.append(q + " " + e + NEWLINE);        
         for (Integer q : F.keys())
         	s.append(q + " " + F.get(q) + NEWLINE);
         return s.toString();
