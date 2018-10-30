@@ -62,7 +62,7 @@ public class Compose {
 					Integer n = Q.get(newComposeState);
 					if (arcs.contains(p)) E = arcs.get(p);
 					else				  E = new Bag<Arc>();
-					Arc arc = new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), n); 
+					Arc arc = new Arc(f.e1().i(), f.e2().o(), f.e1().w() + f.e2().w(), p, n); 
 					E.add(arc);
 					arcs.put(p, E);
 					//StdOut.println(p + " " + arc);

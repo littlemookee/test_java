@@ -41,7 +41,7 @@ public class WFST
 					Bag<Arc> E;
 					if (arcs.contains(p)) E = arcs.get(p);
 					else				  E = new Bag<Arc>();
-					E.add(new Arc(i, o, 0.0, n));
+					E.add(new Arc(i, o, 0.0, p, n));
 					arcs.put(p, E);
 					if (!I.contains(p)) I.add(p);
 				}
@@ -56,7 +56,7 @@ public class WFST
 					Bag<Arc> E;
 					if (arcs.contains(p)) E = arcs.get(p);
 					else				  E = new Bag<Arc>();
-					E.add(new Arc(i, o, w, n));
+					E.add(new Arc(i, o, w, p, n));
 					arcs.put(p, E);
 					if (!I.contains(p)) I.add(p);
 				}
@@ -77,8 +77,8 @@ public class WFST
 				arcs.put(f, E);	
 			}
 			// Use -1 as <eps>_L, add for each state arc(-1,0) arc(0,-1)
-			E.add(new Arc(-1, 0, 0.0, f));
-			E.add(new Arc(0, -1, 0.0, f));
+			E.add(new Arc(-1, 0, 0.0, f, f));
+			E.add(new Arc(0, -1, 0.0, f, f));
 		}
 	}
 	
