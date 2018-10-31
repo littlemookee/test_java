@@ -106,6 +106,8 @@ public class WFST
     	if (arcs.contains(q)) return arcs.get(q);
     	else 				  return new Bag<Arc>();
     }    
+    
+    public Iterable<Integer> getStates() { return arcs.keys(); }
 	
     public static void main(String[] args) {    	
         WFST wfst = new WFST(args[0]);

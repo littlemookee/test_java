@@ -1,10 +1,10 @@
 public class Arc
 {	
-	final Integer i;
-	final Integer o;
-	final Integer p;
-	final Integer n;
-	final Double w;	
+	private final Integer i;
+	private final Integer o;
+	private final Integer p;
+	private final Integer n;
+	private final Double w;	
 	
 	public Arc(Integer i, Integer o, Double w, Integer p, Integer n)
 	{
